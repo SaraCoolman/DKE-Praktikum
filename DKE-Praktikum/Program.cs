@@ -56,7 +56,7 @@ namespace TEST
                     // Create some sample data
                     var tv = new Product
                     {
-                        Description = "Television",
+                        Description = "Televisions",
                         SKU = 4001,
                         Price = 2000
                     };
@@ -74,7 +74,7 @@ namespace TEST
                     };
                     var smartphone = new Product
                     {
-                        Description = "IPONE x",
+                        Description = "IPONE xs",
                         SKU = 1234,
                         Price = 400.0
                     };
