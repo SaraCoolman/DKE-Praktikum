@@ -16,7 +16,7 @@ namespace TEST
             public int SKU { get; set; }
             [BsonElement("Description")]
             public string Description { get; set; }
-            [BsonElement("Price")]
+            [BsonElement("Prices")]
             public Double Price { get; set; }
         }
 
