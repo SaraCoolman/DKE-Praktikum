@@ -8,25 +8,24 @@ namespace TEST
 {
     class Program
     {
-        public class Product
+        public class Post
         {
             [BsonId]
             public ObjectId Id { get; set; }
-            [BsonElement("SKU")]
-            public int SKU { get; set; }
-            [BsonElement("Description")]
-            public string Description { get; set; }
-            [BsonElement("Prices")]
-            public Double Price { get; set; }
+            [BsonElement("Post-Text")]
+            public string Posting { get; set; }
+            [BsonElement("Datum")]
+            public DateTime PostDatum { get; set; }
+
         }
 
         // replace with your connection string if it is different
-        const string MongoDBConnectionString = "mongodb+srv://Sara:admin@cluster0-pjchg.azure.mongodb.net/test";
+        const string MongoDBConnectionString = "mongodb+srv://Yasar:admin@cluster0-pjchg.azure.mongodb.net/test";
 
         public static async Task Main(string[] args)
         {
             if (!await UpdateProductsAsync()) { Environment.Exit(1); }
-            Console.WriteLine("Finished updating the product collection");
+            Console.WriteLine("Finished updating the Post collection");
             Console.ReadKey();
         }
 
@@ -37,7 +36,7 @@ namespace TEST
 
             // Create the collection object that represents the "products" collection
             var database = client.GetDatabase("PostService");
-            var products = database.GetCollection<Product>("PostService");
+            var posts = database.GetCollection<Post>("PostService");
 
             // Clean up the collection if there is data in there
             await database.DropCollectionAsync("PostService");
@@ -54,55 +53,34 @@ namespace TEST
                 try
                 {
                     // Create some sample data
-                    var tv = new Product
+                    var post1 = new Post
                     {
-                        Description = "Televisions",
-                        SKU = 4001,
-                        Price = 2000
-                    };
-                    var book = new Product
-                    {
-                        Description = "A funny book",
-                        SKU = 43221,
-                        Price = 19.99
-                    };
-                    var dogBowl = new Product
-                    {
-                        Description = "Bowl for Fido",
-                        SKU = 123,
-                        Price = 40.00
-                    };
-                    var smartphone = new Product
-                    {
-                        Description = "IPONE xs",
-                        SKU = 1234,
-                        Price = 400.0
+                        Posting = "Hello world",
+                        PostDatum = DateTime.Now
                     };
 
                     // Insert the sample data
-                    await products.InsertOneAsync(session, tv);
-                    await products.InsertOneAsync(session, book);
-                    await products.InsertOneAsync(session, dogBowl);
-                    await products.InsertOneAsync(session, smartphone);
+                    await posts.InsertOneAsync(session, post1);
 
-                    var resultsBeforeUpdates = await products
-                                    .Find<Product>(session, Builders<Product>.Filter.Empty)
+
+                    var resultsBeforeUpdates = await posts
+                                    .Find<Post>(session, Builders<Post>.Filter.Empty)
                                     .ToListAsync();
-                    Console.WriteLine("Original Prices:\n");
-                    foreach (Product d in resultsBeforeUpdates)
+                    Console.WriteLine("Posts:\n");
+                    foreach (Post d in resultsBeforeUpdates)
                     {
                         Console.WriteLine(
-                                    String.Format("Product Name: {0}\tPrice: {1:0.00}",
-                                        d.Description, d.Price)
+                                    String.Format("Post: {0}\tDatum: {1:0.00}",
+                                        d.Posting, d.PostDatum)
                         );
                     }
 
                     // Increase all the prices by 10% for all products
-                    var update = new UpdateDefinitionBuilder<Product>()
-                            .Mul<Double>(r => r.Price, 1.1);
-                    await products.UpdateManyAsync(session,
-                            Builders<Product>.Filter.Empty,
-                            update); //,options);
+                    //var update = new UpdateDefinitionBuilder<Product>()
+                    //        .Mul<Double>(r => r.Price, 1.1);
+                    //await products.UpdateManyAsync(session,
+                    //        Builders<Product>.Filter.Empty,
+                    //        update); //,options);
 
                     // Made it here without error? Let's commit the transaction
                     await session.CommitTransactionAsync();
@@ -114,22 +92,21 @@ namespace TEST
                     return false;
                 }
 
-                // Let's print the new results to the console
-                Console.WriteLine("\n\nNew Prices (10% increase):\n");
-                var resultsAfterCommit = await products
-                        .Find<Product>(session, Builders<Product>.Filter.Empty)
-                        .ToListAsync();
-                foreach (Product d in resultsAfterCommit)
-                {
-                    Console.WriteLine(
-                        String.Format("Product Name: {0}\tPrice: {1:0.00}",
-                                                    d.Description, d.Price)
-                    );
-                }
+                //// Let's print the new results to the console
+                //Console.WriteLine("\n\nNew Prices (10% increase):\n");
+                //var resultsAfterCommit = await products
+                //        .Find<Product>(session, Builders<Product>.Filter.Empty)
+                //        .ToListAsync();
+                //foreach (Product d in resultsAfterCommit)
+                //{
+                //    Console.WriteLine(
+                //        String.Format("Product Name: {0}\tPrice: {1:0.00}",
+                //                                    d.Description, d.Price)
+                //    );
+                //}
 
                 return true;
             }
         }
     }
 }
-
